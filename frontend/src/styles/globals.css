@@ -1,0 +1,65 @@
+/**
+ * Global styles using Tailwind CSS.
+ *
+ * Educational note: Tailwind CSS is a utility-first CSS framework.
+ * Instead of writing custom CSS, you compose styles using utility classes
+ * like "flex", "bg-blue-500", "rounded-lg", etc.
+ *
+ * This file imports Tailwind's base styles, components, and utilities.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Custom global styles
+ */
+
+/* Smooth scrolling for the entire app */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Remove default margins and ensure full height */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Custom scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Prevent text selection on UI elements (except text content) */
+button,
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+/* Ensure SVG text is readable */
+svg text {
+  user-select: none;
+  -webkit-user-select: none;
+}
