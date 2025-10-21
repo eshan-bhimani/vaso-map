@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Main entry point for the VasoMap Spring Boot application.
+ * Main entry point for the VesselNav Spring Boot application.
  *
  * Educational note: @SpringBootApplication is a convenience annotation that combines:
  * - @Configuration: Marks this as a source of bean definitions
@@ -19,7 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * - And much more, all based on classpath and properties
  */
 @SpringBootApplication
-public class VasoMapApplication {
+public class VesselNavApplication {
 
 	/**
 	 * Application entry point.
@@ -30,6 +30,6 @@ public class VasoMapApplication {
 	 * @param args Command-line arguments
 	 */
 	public static void main(String[] args) {
-		SpringApplication.run(VasoMapApplication.class, args);
+		SpringApplication.run(VesselNavApplication.class, args);
 	}
 }

@@ -1,11 +1,11 @@
 spring:
   application:
-    name: vasomap
+    name: vesselnav
 
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/vasomap}
-    username: ${DATABASE_USER:vasomap}
-    password: ${DATABASE_PASSWORD:vasomap}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/vesselnav}
+    username: ${DATABASE_USER:vesselnav}
+    password: ${DATABASE_PASSWORD:vesselnav}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -16,7 +16,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
+    open-in-view: true
 
   flyway:
     enabled: true
@@ -38,6 +38,8 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+    include-stacktrace: always
+    include-exception: true
 
 # Logging configuration
 logging:

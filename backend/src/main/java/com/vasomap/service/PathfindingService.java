@@ -95,15 +95,16 @@ public class PathfindingService {
 	 * Educational note: PostgreSQL's WITH RECURSIVE allows us to perform
 	 * graph traversal in SQL. The query works as follows:
 	 *
-	 * 1. Base case: Start with all edges from the source vessel
-	 * 2. Recursive case: From each vessel in the current path, explore its children
+	 * 1. Base case: Start with all edges from the source vessel (bidirectional)
+	 * 2. Recursive case: From each vessel in the current path, explore neighbors
+	 *    in both directions (upstream and downstream)
 	 * 3. Stop conditions:
 	 *    - Don't revisit vessels (prevents cycles)
 	 *    - Maximum depth of 20 (prevents infinite loops)
 	 *    - Stop when we reach the target
 	 * 4. Return the shortest path that reaches the target
 	 *
-	 * This is essentially a breadth-first search implemented in SQL.
+	 * This is essentially a bidirectional breadth-first search implemented in SQL.
 	 *
 	 * @param sourceId Starting vessel ID
 	 * @param targetId Destination vessel ID
@@ -113,7 +114,7 @@ public class PathfindingService {
 	private List<Long> findShortestPath(Long sourceId, Long targetId) {
 		String sql = """
 			WITH RECURSIVE vessel_path AS (
-				-- Base case: Start with edges from the source vessel
+				-- Base case: Start with all adjacent vessels from the source (bidirectional)
 				SELECT
 					e.child_id as vessel_id,
 					ARRAY[:sourceId, e.child_id] as path,
@@ -121,18 +122,34 @@ public class PathfindingService {
 				FROM vessel_edges e
 				WHERE e.parent_id = :sourceId
 
+				UNION
+
+				SELECT
+					e.parent_id as vessel_id,
+					ARRAY[:sourceId, e.parent_id] as path,
+					1 as depth
+				FROM vessel_edges e
+				WHERE e.child_id = :sourceId
+
 				UNION ALL
 
-				-- Recursive case: Extend paths from current vessels
+				-- Recursive case: Extend paths to adjacent vessels (bidirectional)
+				-- Combine both upstream and downstream neighbors in a single SELECT
 				SELECT
-					e.child_id,
-					vp.path || e.child_id,
-					vp.depth + 1
+					CASE
+						WHEN e.parent_id = vp.vessel_id THEN e.child_id
+						ELSE e.parent_id
+					END as vessel_id,
+					vp.path || CASE
+						WHEN e.parent_id = vp.vessel_id THEN e.child_id
+						ELSE e.parent_id
+					END as path,
+					vp.depth + 1 as depth
 				FROM vessel_edges e
-				INNER JOIN vessel_path vp ON e.parent_id = vp.vessel_id
+				INNER JOIN vessel_path vp ON (e.parent_id = vp.vessel_id OR e.child_id = vp.vessel_id)
 				WHERE
 					-- Prevent cycles by checking if vessel is already in path
-					NOT e.child_id = ANY(vp.path)
+					(CASE WHEN e.parent_id = vp.vessel_id THEN e.child_id ELSE e.parent_id END) != ALL(vp.path)
 					-- Limit depth to prevent excessive recursion
 					AND vp.depth < 20
 					-- Stop exploring once we've reached the target

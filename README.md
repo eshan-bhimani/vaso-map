@@ -1,7 +1,6 @@
-# VasoMap - Vascular System Explorer
+# VesselNav - Vascular System Explorer
 
-VasoMap is a Google Maps-style web application for exploring the human vascular system. The MVP focuses on coronary arteries with plans to expand to the complete cardiovascular system.
-
+VesselNav is a Google Maps-style web application for exploring the human vascular system. The MVP focuses on coronary arteries with plans to expand to the complete cardiovascular system.
 
 ## Features
 
@@ -41,8 +40,8 @@ VasoMap is a Google Maps-style web application for exploring the human vascular 
 ### 1. Clone the Repository
 
 \`\`\`bash
-git clone https://github.com/yourusername/vasomap.git
-cd vasomap
+git clone https://github.com/yourusername/vesselnav.git
+cd vesselnav
 \`\`\`
 
 ### 2. Start the Database

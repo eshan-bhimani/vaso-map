@@ -32,12 +32,12 @@ public class OpenAPIConfig {
 	 * @return OpenAPI configuration
 	 */
 	@Bean
-	public OpenAPI vasoMapOpenAPI() {
+	public OpenAPI vesselNavOpenAPI() {
 		return new OpenAPI()
 			.info(new Info()
-				.title("VasoMap API")
+				.title("VesselNav API")
 				.description("""
-					REST API for VasoMap - A Google Maps-style explorer for the human vascular system.
+					REST API for VesselNav - A Google Maps-style explorer for the human vascular system.
 
 					This API provides endpoints for:
 					- Querying blood vessels and their properties
@@ -48,9 +48,9 @@ public class OpenAPIConfig {
 					""")
 				.version("1.0.0")
 				.contact(new Contact()
-					.name("VasoMap Team")
-					.email("support@vasomap.com")
-					.url("https://vasomap.com"))
+					.name("VesselNav Team")
+					.email("support@vesselnav.com")
+					.url("https://vesselnav.com"))
 				.license(new License()
 					.name("MIT License")
 					.url("https://opensource.org/licenses/MIT")))

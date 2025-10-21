@@ -89,12 +89,8 @@ public interface VesselRepository extends JpaRepository<Vessel, Long> {
 	 * @return Optional containing the fully-loaded vessel if found
 	 */
 	@Query("""
-		SELECT DISTINCT v FROM Vessel v
-		LEFT JOIN FETCH v.aliases
+		SELECT v FROM Vessel v
 		LEFT JOIN FETCH v.region
-		LEFT JOIN FETCH v.notes
-		LEFT JOIN FETCH v.outgoingEdges
-		LEFT JOIN FETCH v.incomingEdges
 		WHERE v.id = :id
 	""")
 	Optional<Vessel> findByIdWithDetails(@Param("id") Long id);

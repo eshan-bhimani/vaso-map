@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: vasomap
-      POSTGRES_USER: vasomap
-      POSTGRES_PASSWORD: vasomap
+      POSTGRES_DB: vesselnav
+      POSTGRES_USER: vesselnav
+      POSTGRES_PASSWORD: vesselnav
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "vasomap"]
+      test: ["CMD", "pg_isready", "-U", "vesselnav"]
       interval: 10s
       timeout: 5s
       retries: 5

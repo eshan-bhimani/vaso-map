@@ -33,7 +33,7 @@ function App() {
               />
             </svg>
             <div>
-              <h1 className="text-2xl font-bold">VasoMap</h1>
+              <h1 className="text-2xl font-bold">VesselNav</h1>
               <p className="text-blue-100 text-sm">
                 Explore the human vascular system
               </p>
