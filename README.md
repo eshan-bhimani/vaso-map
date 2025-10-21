@@ -2,7 +2,6 @@
 
 VasoMap is a Google Maps-style web application for exploring the human vascular system. The MVP focuses on coronary arteries with plans to expand to the complete cardiovascular system.
 
-![VasoMap Screenshot](docs/screenshot.png)
 
 ## Features
 
