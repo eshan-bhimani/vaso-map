@@ -233,13 +233,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Mobile responsive design
 - [ ] AWS deployment with Terraform
 
-## Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Email: support@vasomap.com
-- Documentation: [https://docs.vasomap.com](https://docs.vasomap.com)
-
 ---
 
-**Built with ❤️ for medical education**
+**Built for medical education!**
