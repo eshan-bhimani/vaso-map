@@ -39,8 +39,13 @@ public class CorsConfig {
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 
-		// Allow frontend origin (Vite dev server)
-		config.setAllowedOrigins(List.of("http://localhost:5173"));
+		// Allow frontend origins (localhost for dev, Vercel for production)
+		// Note: Replace with your actual Vercel domain after deployment
+		config.setAllowedOriginPatterns(Arrays.asList(
+			"http://localhost:5173",
+			"https://*.vercel.app",
+			"https://vesselnav.vercel.app"
+		));
 
 		// Allow all HTTP methods
 		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

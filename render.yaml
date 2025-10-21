@@ -1,0 +1,42 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: vesselnav-db
+    env: docker
+    plan: free
+    ipAllowList: []
+    dockerfilePath: ./Dockerfile.postgres
+    envVars:
+      - key: POSTGRES_DB
+        value: vesselnav
+      - key: POSTGRES_USER
+        value: vesselnav
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+    disk:
+      name: vesselnav-db-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  # Spring Boot Backend
+  - type: web
+    name: vesselnav-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /api/v1/vessels
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vesselnav-db
+          property: connectionString
+      - key: DATABASE_USER
+        fromDatabase:
+          name: vesselnav-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: vesselnav-db
+          property: password
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
