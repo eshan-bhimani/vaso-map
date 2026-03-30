@@ -1,173 +1,115 @@
-/**
- * Utility functions for graph operations.
- *
- * Educational note: These utilities help with:
- * - Building graph data structures from API responses
- * - Color mapping for different vessel types
- * - Graph calculations
- */
+import type { Vessel, VesselDetail, VesselEdge, VesselType, Oxygenation } from '../types/vessel';
 
-import type { Vessel, VesselEdge, VesselType, Oxygenation } from '../types/vessel';
+/* ── Color palette ── */
+export const VESSEL_COLORS: Record<string, string> = {
+  ARTERY:    '#e11d48',
+  VEIN:      '#2563eb',
+  CAPILLARY: '#7c3aed',
+};
 
-/**
- * Get color for a vessel type.
- *
- * Educational note: Consistent color coding helps users quickly identify
- * vessel types in the visualization.
- *
- * @param type Vessel type
- * @returns Hex color code
- */
-export function getVesselTypeColor(type: VesselType): string {
-  switch (type) {
-    case 'ARTERY':
-      return '#ef4444'; // red-500 (Tailwind)
-    case 'VEIN':
-      return '#3b82f6'; // blue-500
-    case 'CAPILLARY':
-      return '#a855f7'; // purple-500
-    default:
-      return '#6b7280'; // gray-500
-  }
+export const VESSEL_GLOW_COLORS: Record<string, string> = {
+  ARTERY:    'rgba(225,29,72,0.5)',
+  VEIN:      'rgba(37,99,235,0.5)',
+  CAPILLARY: 'rgba(124,58,237,0.5)',
+};
+
+export const SELECTED_COLOR = '#f59e0b';
+export const PATH_HIGHLIGHT_COLOR = '#22d3ee';
+export const PATH_GLOW = 'rgba(34,211,238,0.55)';
+
+export function getVesselTypeColor(type: VesselType | string): string {
+  return VESSEL_COLORS[type as string] ?? '#6b7280';
 }
 
-/**
- * Get color for oxygenation status.
- * Alternative coloring scheme (not used in MVP but useful for future).
- *
- * @param oxygenation Oxygenation status
- * @returns Hex color code
- */
 export function getOxygenationColor(oxygenation: Oxygenation): string {
   switch (oxygenation) {
-    case 'OXYGENATED':
-      return '#ef4444'; // red (oxygen-rich)
-    case 'DEOXYGENATED':
-      return '#3b82f6'; // blue (oxygen-poor)
-    case 'MIXED':
-      return '#a855f7'; // purple (mixed)
-    default:
-      return '#6b7280'; // gray
+    case 'OXYGENATED':   return '#e11d48';
+    case 'DEOXYGENATED': return '#2563eb';
+    case 'MIXED':        return '#7c3aed';
+    default:             return '#6b7280';
   }
 }
 
-/**
- * Color for selected vessels.
- */
-export const SELECTED_COLOR = '#fbbf24'; // amber-400
-
-/**
- * Color for highlighted path.
- */
-export const PATH_HIGHLIGHT_COLOR = '#10b981'; // emerald-500
-
-/**
- * Build edges from vessel data.
- *
- * Educational note: The backend doesn't return edges directly.
- * Instead, each vessel has upstreamNeighbors and downstreamNeighbors.
- * We derive edges by looking at all vessels and their connections.
- *
- * This function creates a unique edge ID and determines direction.
- *
- * @param vessels Array of vessels with neighbor information
- * @returns Array of edges
- */
-export function buildEdgesFromVessels(vessels: Vessel[]): VesselEdge[] {
-  const edges: VesselEdge[] = [];
-  const edgeSet = new Set<string>(); // Track unique edges to avoid duplicates
-
-  // Note: For the basic vessel list, we don't have neighbor information
-  // Edges will be populated when we fetch vessel details or use a separate endpoint
-  // For now, this returns an empty array and edges should be built from detail data
-
-  return edges;
+/* ── Graph helpers ── */
+export function buildEdgesFromVessels(_vessels: Vessel[]): VesselEdge[] {
+  return [];
 }
 
-/**
- * Check if a vessel is in a highlighted path.
- *
- * @param vesselId Vessel ID to check
- * @param pathHighlight Array of highlighted vessel IDs
- * @returns True if vessel is in the path
- */
 export function isVesselInPath(vesselId: number, pathHighlight: number[]): boolean {
   return pathHighlight.includes(vesselId);
 }
 
-/**
- * Check if an edge is in a highlighted path.
- *
- * Educational note: An edge is in the path if both its source and target
- * are in the path AND they're adjacent in the path array.
- *
- * @param source Source vessel ID
- * @param target Target vessel ID
- * @param pathHighlight Array of highlighted vessel IDs (in order)
- * @returns True if edge is in the path
- */
-export function isEdgeInPath(
-  source: number,
-  target: number,
-  pathHighlight: number[]
-): boolean {
+export function isEdgeInPath(source: number, target: number, pathHighlight: number[]): boolean {
   for (let i = 0; i < pathHighlight.length - 1; i++) {
-    if (pathHighlight[i] === source && pathHighlight[i + 1] === target) {
-      return true;
-    }
+    if (pathHighlight[i] === source && pathHighlight[i + 1] === target) return true;
   }
   return false;
 }
 
-/**
- * Get display name for a vessel (with aliases).
- *
- * @param vessel Vessel object
- * @returns Display name with aliases in parentheses
- */
 export function getVesselDisplayName(vessel: Vessel): string {
-  if (vessel.aliases.length === 0) {
-    return vessel.name;
-  }
+  if (vessel.aliases.length === 0) return vessel.name;
   return `${vessel.name} (${vessel.aliases.join(', ')})`;
 }
 
-/**
- * Format diameter range for display.
- *
- * @param minMm Minimum diameter in mm
- * @param maxMm Maximum diameter in mm
- * @returns Formatted string (e.g., "3.0 - 4.0 mm")
- */
-export function formatDiameterRange(
-  minMm: number | null,
-  maxMm: number | null
-): string {
-  if (minMm === null && maxMm === null) {
-    return 'Unknown';
-  }
-  if (minMm === null) {
-    return `~${maxMm} mm`;
-  }
-  if (maxMm === null) {
-    return `~${minMm} mm`;
-  }
-  if (minMm === maxMm) {
-    return `${minMm} mm`;
-  }
-  return `${minMm} - ${maxMm} mm`;
+export function formatDiameterRange(minMm: number | null, maxMm: number | null): string {
+  if (minMm === null && maxMm === null) return 'Unknown';
+  if (minMm === null) return `~${maxMm} mm`;
+  if (maxMm === null) return `~${minMm} mm`;
+  if (minMm === maxMm) return `${minMm} mm`;
+  return `${minMm} – ${maxMm} mm`;
 }
 
-/**
- * Truncate text to a maximum length.
- *
- * @param text Text to truncate
- * @param maxLength Maximum length
- * @returns Truncated text with ellipsis if needed
- */
 export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) {
-    return text;
+  return text.length <= maxLength ? text : text.slice(0, maxLength - 3) + '…';
+}
+
+/* ── Anatomical data generators ── */
+export function getCommonConditions(vessel: VesselDetail): Array<{ name: string; severity: 'high' | 'medium' | 'low' }> {
+  const byType: Record<string, Array<{ name: string; severity: 'high' | 'medium' | 'low' }>> = {
+    ARTERY: [
+      { name: 'Atherosclerosis', severity: 'high' },
+      { name: 'Arterial stenosis', severity: 'high' },
+      { name: 'Aneurysm', severity: 'high' },
+      { name: 'Thrombosis', severity: 'medium' },
+      { name: 'Vasospasm', severity: 'medium' },
+    ],
+    VEIN: [
+      { name: 'Deep vein thrombosis', severity: 'high' },
+      { name: 'Varicose veins', severity: 'medium' },
+      { name: 'Venous insufficiency', severity: 'medium' },
+      { name: 'Phlebitis', severity: 'low' },
+    ],
+    CAPILLARY: [
+      { name: 'Microvascular disease', severity: 'high' },
+      { name: 'Capillaritis', severity: 'medium' },
+      { name: 'Ischemic microangiopathy', severity: 'high' },
+      { name: 'Diabetic angiopathy', severity: 'medium' },
+    ],
+  };
+  return byType[vessel.type] ?? [];
+}
+
+export function getConnectedSystems(vessel: VesselDetail): string[] {
+  const region = vessel.region?.name?.toUpperCase() ?? '';
+  const byRegion: Record<string, string[]> = {
+    HEAD:        ['Nervous System', 'Lymphatic System', 'Ophthalmic System'],
+    THORAX:      ['Cardiovascular System', 'Respiratory System', 'Lymphatic System'],
+    ABDOMEN:     ['Digestive System', 'Urinary System', 'Hepatic Portal System'],
+    UPPER_LIMB:  ['Musculoskeletal System', 'Lymphatic System', 'Peripheral Nervous System'],
+    LOWER_LIMB:  ['Musculoskeletal System', 'Lymphatic System', 'Peripheral Nervous System'],
+    PELVIS:      ['Urogenital System', 'Lymphatic System'],
+    NECK:        ['Lymphatic System', 'Nervous System'],
+  };
+  for (const key of Object.keys(byRegion)) {
+    if (region.includes(key)) return byRegion[key];
   }
-  return text.substring(0, maxLength - 3) + '...';
+  return ['Cardiovascular System', 'Lymphatic System'];
+}
+
+export function getVesselTypeLabel(type: string): string {
+  return { ARTERY: 'Artery', VEIN: 'Vein', CAPILLARY: 'Capillary' }[type] ?? type;
+}
+
+export function getOxygenationLabel(o: string): string {
+  return { OXYGENATED: 'Oxygenated', DEOXYGENATED: 'Deoxygenated', MIXED: 'Mixed' }[o] ?? o;
 }

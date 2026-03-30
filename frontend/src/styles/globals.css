@@ -1,65 +1,88 @@
-/**
- * Global styles using Tailwind CSS.
- *
- * Educational note: Tailwind CSS is a utility-first CSS framework.
- * Instead of writing custom CSS, you compose styles using utility classes
- * like "flex", "bg-blue-500", "rounded-lg", etc.
- *
- * This file imports Tailwind's base styles, components, and utilities.
- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/**
- * Custom global styles
- */
-
-/* Smooth scrolling for the entire app */
-* {
-  scroll-behavior: smooth;
+/* ── CSS Custom Properties ── */
+:root {
+  --artery:        #e11d48;
+  --artery-rgb:    225, 29, 72;
+  --vein:          #2563eb;
+  --vein-rgb:      37, 99, 235;
+  --capillary:     #7c3aed;
+  --capillary-rgb: 124, 58, 237;
+  --accent:        #22d3ee;
+  --accent-rgb:    34, 211, 238;
+  --selected:      #f59e0b;
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-hi:     rgba(255, 255, 255, 0.16);
 }
 
-/* Remove default margins and ensure full height */
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
+* { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+
+html, body, #root {
   height: 100%;
+  width: 100%;
+  background: #030712;
+  color: #f0f6fc;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar styling for webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* ── Scrollbar ── */
+::-webkit-scrollbar           { width: 5px; height: 5px; }
+::-webkit-scrollbar-track     { background: transparent; }
+::-webkit-scrollbar-thumb     { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ── Glass utility classes ── */
+@layer components {
+  .glass {
+    background: rgba(13, 17, 23, 0.78);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .glass-elevated {
+    background: rgba(22, 27, 34, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65),
+                inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  .label-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  .panel-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Prevent text selection on UI elements (except text content) */
-button,
-.no-select {
+/* ── SVG text non-selectable ── */
+button, .no-select, svg text {
   user-select: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
 }
 
-/* Ensure SVG text is readable */
-svg text {
-  user-select: none;
-  -webkit-user-select: none;
+/* ── D3 Path Animations ── */
+@keyframes dash-flow {
+  to { stroke-dashoffset: -20; }
+}
+
+.path-edge-animated {
+  stroke-dasharray: 8 4;
+  animation: dash-flow 0.55s linear infinite;
 }
