@@ -18,8 +18,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    host: true, // Listen on all addresses
-    open: true, // Open browser on start
+    host: true,
+    open: true,
+    proxy: {
+      '/api': 'http://localhost:8080',
+    },
   },
   build: {
     outDir: 'dist',
