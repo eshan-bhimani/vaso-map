@@ -16,10 +16,18 @@ import type {
   PathResponse,
   ErrorResponse,
 } from '../types/vessel';
+import {
+  staticVessels,
+  staticEdges,
+  getStaticVesselDetail,
+} from '../data/vessels';
 
 // Base URL for API requests
 // In production, this would come from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+
+/** Whether to use static fallback data (set on first failed API call). */
+let useStaticData: boolean | null = null;
 
 /**
  * Custom error class for API errors.
@@ -88,8 +96,25 @@ export const vesselsApi = {
    * @returns Array of vessels
    */
   getAll: async (query?: string): Promise<Vessel[]> => {
-    const url = query ? `/vessels?query=${encodeURIComponent(query)}` : '/vessels';
-    return fetchApi<Vessel[]>(url);
+    if (useStaticData) {
+      const q = query?.toLowerCase();
+      return q
+        ? staticVessels.filter((v) =>
+            v.name.toLowerCase().includes(q) ||
+            v.aliases.some((a) => a.toLowerCase().includes(q))
+          )
+        : staticVessels;
+    }
+    try {
+      const url = query ? `/vessels?query=${encodeURIComponent(query)}` : '/vessels';
+      const result = await fetchApi<Vessel[]>(url);
+      if (!Array.isArray(result)) throw new Error('Invalid response');
+      useStaticData = false;
+      return result;
+    } catch {
+      if (useStaticData === null) useStaticData = true;
+      return vesselsApi.getAll(query);
+    }
   },
 
   /**
@@ -99,7 +124,17 @@ export const vesselsApi = {
    * @returns Detailed vessel information
    */
   getById: async (id: number): Promise<VesselDetail> => {
-    return fetchApi<VesselDetail>(`/vessels/${id}`);
+    if (useStaticData) {
+      const detail = getStaticVesselDetail(id);
+      if (!detail) throw new ApiError('Vessel not found', 404);
+      return detail;
+    }
+    try {
+      return await fetchApi<VesselDetail>(`/vessels/${id}`);
+    } catch {
+      if (useStaticData === null) useStaticData = true;
+      return vesselsApi.getById(id);
+    }
   },
 };
 
@@ -114,12 +149,61 @@ export const pathsApi = {
    * @returns Path response with ordered vessel list
    */
   findPath: async (request: PathRequest): Promise<PathResponse> => {
-    return fetchApi<PathResponse>('/paths', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    if (useStaticData) {
+      return staticFindPath(request);
+    }
+    try {
+      return await fetchApi<PathResponse>('/paths', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+    } catch {
+      if (useStaticData === null) useStaticData = true;
+      return staticFindPath(request);
+    }
   },
 };
+
+/** BFS pathfinding on static edge data (undirected). */
+function staticFindPath(request: PathRequest): PathResponse {
+  const { sourceId, targetId } = request;
+  const adj = new Map<number, number[]>();
+  for (const e of staticEdges) {
+    if (!adj.has(e.source)) adj.set(e.source, []);
+    if (!adj.has(e.target)) adj.set(e.target, []);
+    adj.get(e.source)!.push(e.target);
+    adj.get(e.target)!.push(e.source);
+  }
+  const visited = new Set<number>([sourceId]);
+  const parent = new Map<number, number>();
+  const queue = [sourceId];
+  while (queue.length > 0) {
+    const curr = queue.shift()!;
+    if (curr === targetId) break;
+    for (const neighbor of adj.get(curr) ?? []) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        parent.set(neighbor, curr);
+        queue.push(neighbor);
+      }
+    }
+  }
+  if (!parent.has(targetId) && sourceId !== targetId) {
+    throw new ApiError('No path found', 404);
+  }
+  const ids: number[] = [];
+  let cur = targetId;
+  while (cur !== sourceId) {
+    ids.unshift(cur);
+    cur = parent.get(cur)!;
+  }
+  ids.unshift(sourceId);
+  const path = ids.map((id) => {
+    const v = staticVessels.find((v) => v.id === id)!;
+    return { id: v.id, name: v.name, type: v.type };
+  });
+  return { path, pathLength: path.length };
+}
 
 /**
  * Combined API object for easy imports.
