@@ -267,20 +267,55 @@ function PathSection() {
 }
 
 /* ── Main ── */
-export function LeftPanel() {
+export function LeftPanel({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   return (
-    <motion.aside
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="w-64 flex-shrink-0 flex flex-col glass border-r border-white/[0.07] overflow-y-auto"
-    >
-      <motion.div variants={stagger.container} initial="initial" animate="animate" className="flex flex-col">
-        <SearchSection />
-        <StatsSection />
-        <LegendSection />
-        <PathSection />
-      </motion.div>
-    </motion.aside>
+    <>
+      {/* Collapsed rail — small tab to reopen */}
+      {collapsed && (
+        <div className="flex-shrink-0 flex flex-col items-center py-3 glass border-r border-white/[0.07]" style={{ width: 40 }}>
+          <button
+            onClick={onToggle}
+            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors"
+            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+            title="Open sidebar"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="text-text-dim">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Expanded panel */}
+      {!collapsed && (
+        <motion.aside
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className="w-80 flex-shrink-0 flex flex-col glass border-r border-white/[0.07] overflow-y-auto"
+        >
+          {/* Collapse button */}
+          <div className="flex items-center justify-end px-3 pt-3">
+            <button
+              onClick={onToggle}
+              className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors"
+              style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+              title="Close sidebar"
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-text-dim">
+                <path d="M10 4l-4 4 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <motion.div variants={stagger.container} initial="initial" animate="animate" className="flex flex-col">
+            <SearchSection />
+            <StatsSection />
+            <LegendSection />
+            <PathSection />
+          </motion.div>
+        </motion.aside>
+      )}
+    </>
   );
 }

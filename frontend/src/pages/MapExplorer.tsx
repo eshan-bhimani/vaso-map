@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapCanvas } from '../components/MapView/MapCanvas';
 import { VesselDeepDive } from '../components/InfoPanel/VesselDeepDive';
@@ -36,6 +36,7 @@ function EmptyRightPanel() {
 
 export default function MapExplorer() {
   const { selectedVessel, commandPaletteOpen, setCommandPaletteOpen } = useMapStore();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -50,7 +51,7 @@ export default function MapExplorer() {
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      <LeftPanel />
+      <LeftPanel collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((c) => !c)} />
 
       <main className="flex-1 overflow-hidden relative">
         <MapCanvas />

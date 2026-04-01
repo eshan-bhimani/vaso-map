@@ -26,14 +26,14 @@ export function NavBar() {
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-3 no-underline">
           <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center"
+            className="w-11 h-11 rounded-xl flex items-center justify-center"
             style={{
               background: 'rgba(34,211,238,0.12)',
               border: '1px solid rgba(34,211,238,0.3)',
-              boxShadow: '0 0 16px rgba(34,211,238,0.15)',
+              boxShadow: '0 0 20px rgba(34,211,238,0.15)',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-path-accent">
+            <svg width="22" height="22" viewBox="0 0 16 16" fill="none" className="text-path-accent">
               <circle cx="8" cy="8" r="2.5" fill="currentColor" />
               <path
                 d="M2 8c0-2 1.5-4 4-5M14 8c0 2-1.5 4-4 5M8 2c2 0 4 1.5 5 4M8 14c-2 0-4-1.5-5-4"
@@ -42,8 +42,8 @@ export function NavBar() {
             </svg>
           </div>
           <div>
-            <h1 className="text-sm font-bold text-text-pri tracking-wide">VesselNav</h1>
-            <p className="text-[10px] font-mono text-text-dim tracking-wider">VASCULAR DISCOVERY PLATFORM</p>
+            <h1 className="text-base font-bold text-text-pri tracking-wide">VesselNav</h1>
+            <p className="text-[11px] font-mono text-text-dim tracking-wider">VASCULAR DISCOVERY PLATFORM</p>
           </div>
         </NavLink>
 
