@@ -41,10 +41,26 @@ export default function FlashcardStudy() {
   const [flipped, setFlipped] = useState(false);
   const [sessionStats, setSessionStats] = useState({ reviewed: 0, mastered: 0, learning: 0 });
   const [completed, setCompleted] = useState(false);
+  const [history, setHistory] = useState<number[]>([]);
 
   const currentCard = sortedCards[currentIndex];
 
   const handleFlip = useCallback(() => setFlipped((f) => !f), []);
+
+  const handleGoBack = useCallback(() => {
+    if (completed) {
+      setCompleted(false);
+      setFlipped(false);
+      return;
+    }
+    if (history.length === 0) return;
+    const prev = history[history.length - 1];
+    setHistory((h) => h.slice(0, -1));
+    setCurrentIndex(prev);
+    setFlipped(false);
+  }, [history, completed]);
+
+  const canGoBack = history.length > 0 || completed;
 
   const handleMark = useCallback(
     (status: CardStatus) => {
@@ -57,6 +73,8 @@ export default function FlashcardStudy() {
         learning: s.learning + (status === 'learning' || status === 'flagged' ? 1 : 0),
       }));
 
+      setHistory((h) => [...h, currentIndex]);
+
       if (currentIndex < sortedCards.length - 1) {
         setFlipped(false);
         setCurrentIndex((i) => i + 1);
@@ -67,17 +85,21 @@ export default function FlashcardStudy() {
     [user, currentCard, currentIndex, sortedCards.length, markCard],
   );
 
-  // Spacebar to flip
+  // Spacebar to flip, left arrow to go back
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.code === 'Space' && !completed) {
         e.preventDefault();
         handleFlip();
       }
+      if (e.code === 'ArrowLeft' && canGoBack) {
+        e.preventDefault();
+        handleGoBack();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleFlip, completed]);
+  }, [handleFlip, handleGoBack, completed, canGoBack]);
 
   if (!deck || !user) {
     navigate('/flashcards');
@@ -124,20 +146,39 @@ export default function FlashcardStudy() {
             </div>
           </div>
 
-          {deckId !== 'review' && (
-            <button
-              onClick={() => {
-                resetDeck(user.id, deckId!);
-                setCurrentIndex(0);
-                setFlipped(false);
-                setSessionStats({ reviewed: 0, mastered: 0, learning: 0 });
-                setCompleted(false);
-              }}
-              className="text-xs text-text-dim hover:text-red-400 transition-colors"
-            >
-              Reset Deck
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {canGoBack && (
+              <button
+                onClick={handleGoBack}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-text-sec hover:bg-white/[0.06] transition-all"
+                style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 3L1 8l5 5M1 8h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Go Back
+                <kbd className="ml-0.5 px-1 py-0.5 rounded text-[9px] font-mono" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  ←
+                </kbd>
+              </button>
+            )}
+
+            {deckId !== 'review' && (
+              <button
+                onClick={() => {
+                  resetDeck(user.id, deckId!);
+                  setCurrentIndex(0);
+                  setFlipped(false);
+                  setSessionStats({ reviewed: 0, mastered: 0, learning: 0 });
+                  setCompleted(false);
+                  setHistory([]);
+                }}
+                className="text-xs text-text-dim hover:text-red-400 transition-colors"
+              >
+                Reset Deck
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Progress bar */}
@@ -188,6 +229,7 @@ export default function FlashcardStudy() {
                     setFlipped(false);
                     setSessionStats({ reviewed: 0, mastered: 0, learning: 0 });
                     setCompleted(false);
+                    setHistory([]);
                   }}
                   className="px-4 py-2 rounded-lg text-sm font-medium text-path-accent transition-all"
                   style={{ border: '1px solid rgba(34,211,238,0.3)', background: 'rgba(34,211,238,0.08)' }}
